@@ -17,6 +17,7 @@ contract MarketTest is Test {
         currency = new BimToken(1_000_000_000_000_000_000_000_000);
         goods = new BimNFT();
         market = new Market(address(currency), address(goods));
+        deal(address(this), 1000);
     }
 
     function test_NFTMint() public {
@@ -50,12 +51,13 @@ contract MarketTest is Test {
             )
         );
         // It will revert an insufficient approval error, which is defined in
-        // interface IERC6093.sol, since I simply use its implementation of ERC721.
+        // interface IERC6093.sol, since I simply use the implementation of ERC721.
         goods.safeTransferFrom(address(this), address(market), tokenId2, data);
     }
 
     function test_buyNFT(uint256 tokenPrice, address buyer) public {
         vm.assume(tokenPrice > 0 && tokenPrice < 10000);
+        vm.assume(buyer != address(0));
         uint256 tokenId = goods.mint();
         bytes memory price = abi.encode(tokenPrice);
         goods.safeTransferFrom(address(this), address(market), tokenId, price);
@@ -71,6 +73,7 @@ contract MarketTest is Test {
 
     function test_repeatedBuy(uint256 tokenPrice, address buyer) public {
         vm.assume(tokenPrice > 0 && tokenPrice < 10000);
+        vm.assume(buyer != address(0));
         uint256 tokenId = goods.mint();
         bytes memory price = abi.encode(tokenPrice);
         goods.safeTransferFrom(address(this), address(market), tokenId, price);
@@ -96,6 +99,7 @@ contract MarketTest is Test {
 
     function test_inadequatePayment(uint256 tokenPrice, address buyer) public {
         vm.assume(tokenPrice > 0 && tokenPrice < 10000);
+        vm.assume(buyer != address(0));
         uint256 tokenId = goods.mint();
 
         // Put token on market
@@ -111,8 +115,10 @@ contract MarketTest is Test {
         currency.transferAndCall(address(market), tokenPrice - 1, tid);
     }
 
+
     function test_OverPayment(uint256 tokenPrice, address buyer) public {
         vm.assume(tokenPrice > 0 && tokenPrice < 10000);
+        vm.assume(buyer != address(0));
         uint256 tokenId = goods.mint();
 
         // Put token on market
@@ -125,9 +131,11 @@ contract MarketTest is Test {
         bytes memory tid = abi.encode(tokenId);
         // Shouldn't revert, but will pass invariant test.
         currency.transferAndCall(address(market), tokenPrice + 1, tid);
+        assertEq(100, currency.balanceOf(buyer));
     }
 
-    function invariant_MarketHasNoERC20() public {
+    function invariant_MarketHasNoERC20() public view{
         assertEq(0, currency.balanceOf(address(market)));
     }
+    
 }
