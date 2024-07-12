@@ -89,12 +89,13 @@ contract MarketTest is Test {
         // Buying should pass.
         bytes memory tid = abi.encode(tokenId);
         assert(currency.transferAndCall(address(market), tokenPrice, tid));
+        vm.stopPrank();
 
-        vm.prank(address(this));
         vm.expectRevert("no such token");
         currency.transfer(buyer, tokenPrice);
-        vm.prank(buyer);
+        vm.startPrank(buyer);
         currency.transferAndCall(address(market), tokenPrice, tid);
+        vm.stopPrank();
     }
 
     function test_inadequatePayment(uint256 tokenPrice, address buyer) public {
@@ -127,11 +128,12 @@ contract MarketTest is Test {
 
         currency.transfer(buyer, tokenPrice + 100);
 
-        vm.prank(buyer);
+        vm.startPrank(buyer);
         bytes memory tid = abi.encode(tokenId);
         // Shouldn't revert, but will pass invariant test.
         currency.transferAndCall(address(market), tokenPrice + 1, tid);
         assertEq(100, currency.balanceOf(buyer));
+        vm.stopPrank();
     }
 
     function invariant_MarketHasNoERC20() public view{

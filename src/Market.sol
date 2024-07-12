@@ -63,7 +63,7 @@ contract Market is IERC1363Receiver, IERC721Receiver{
             );
         }
         IERC721(goods).transferFrom(address(this), buyer, tokenId);
-        IERC20(currency).transfer(item.owner, payment);
+        IERC20(currency).transfer(item.owner, item.price);
         emit TokenBought(item.owner, buyer, tokenId);
 
         delete tokenInfoOf[tokenId]; // once payment succeeded, the token is out of market
