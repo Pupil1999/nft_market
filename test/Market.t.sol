@@ -82,7 +82,7 @@ contract MarketTest is Test {
 
         address oldOwner = address(this);
 
-        vm.prank(buyer);
+        vm.startPrank(buyer);
         
         vm.expectEmit(true, true, true, true, address(market));
         emit Market.TokenBought(oldOwner, buyer, tokenId);

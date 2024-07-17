@@ -1,4 +1,4 @@
-import { createPublicClient, http, getContract } from 'viem'
+import { createPublicClient, http } from 'viem'
 import { abi } from '../out/Nft.sol/ERC721A.json';
 import { mainnet } from 'viem/chains'
  
